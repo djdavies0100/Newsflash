@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Daily Briefing</title>
+<link rel="manifest" href="/static/manifest.json">
+<link rel="icon" type="image/png" href="/static/icons/favicon-32.png">
+<link rel="apple-touch-icon" href="/static/icons/apple-touch-icon.png">
+<meta name="theme-color" content="#1a1a18">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Briefing">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #fbfaf7;
+    --ink: #1a1a18;
+    --ink-soft: #4a4a46;
+    --rule: #d8d5cc;
+    --masthead-red: #a3202e;
+    --navy: #24344d;
+    --pill-bg: #f0eee6;
+  }
+
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Source Serif 4', serif;
+  }
+
+  ::selection { background: var(--masthead-red); color: var(--paper); }
+
+  .wrap {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 0 18px 90px;
+  }
+
+  /* ---------- Masthead ---------- */
+  .masthead {
+    text-align: center;
+    padding: 28px 0 14px;
+  }
+
+  .masthead h1 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 900;
+    font-size: 40px;
+    letter-spacing: -0.01em;
+    margin: 0;
+    line-height: 1;
+  }
+
+  .masthead .the {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.3em;
+    color: var(--ink-soft);
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .rule-double {
+    border: none;
+    border-top: 3px solid var(--ink);
+    border-bottom: 1px solid var(--ink);
+    height: 4px;
+    margin: 12px 0 8px;
+  }
+
+  .dateline {
+    display: flex;
+    justify-content: space-between;
+    font-family: 'Inter', sans-serif;
+    font-size: 10.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  /* ---------- Edition customizer ---------- */
+  .customize {
+    margin: 22px 0 8px;
+  }
+
+  .customize-toggle {
+    width: 100%;
+    background: none;
+    border: 1px solid var(--ink);
+    padding: 10px 14px;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    border-radius: 0;
+  }
+  .customize-toggle:active { background: var(--pill-bg); }
+
+  .customize-panel {
+    padding: 16px 2px 4px;
+    display: none;
+  }
+  .customize-panel.open { display: block; }
+
+  .customize-panel label {
+    font-family: 'Inter', sans-serif;
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-soft);
+    display: block;
+    margin: 14px 0 8px;
+  }
+  .customize-panel label:first-child { margin-top: 0; }
+
+  .pill-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .pill {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    background: var(--pill-bg);
+    border: 1px solid var(--rule);
+    padding: 7px 13px;
+    border-radius: 100px;
+    cursor: pointer;
+    color: var(--ink);
+    transition: background 0.15s;
+  }
+  .pill:hover { background: #e8e4d8; }
+
+  .pill.active {
+    background: var(--ink);
+    color: var(--paper);
+    border-color: var(--ink);
+  }
+
+  .pill.removable {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: var(--ink);
+    color: var(--paper);
+    border-color: var(--ink);
+  }
+  .pill.removable .x {
+    font-size: 15px;
+    line-height: 1;
+    opacity: 0.7;
+  }
+  .pill.removable:active .x { opacity: 1; }
+
+  .custom-input-row {
+    display: flex;
+    gap: 8px;
+  }
+  .custom-input-row input {
+    flex: 1;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    background: var(--paper);
+    border: 1px solid var(--ink);
+    padding: 10px 12px;
+  }
+  .custom-input-row input:focus { outline: none; background: var(--pill-bg); }
+  .custom-input-row button {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    background: var(--ink);
+    color: var(--paper);
+    border: 1px solid var(--ink);
+    padding: 0 18px;
+    cursor: pointer;
+  }
+
+  .refresh-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 14px;
+  }
+  .refresh-btn {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    background: var(--masthead-red);
+    color: #fff;
+    border: none;
+    padding: 10px 16px;
+    cursor: pointer;
+  }
+  .refresh-btn:disabled { opacity: 0.5; }
+
+  /* ---------- Sections ---------- */
+  .section { margin-top: 30px; }
+
+  .section-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 4px;
+  }
+  .section-label span {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--masthead-red);
+    white-space: nowrap;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    border-top: 1px solid var(--ink);
+  }
+
+  .story {
+    display: block;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--rule);
+    transition: opacity 0.2s, border-left 0.2s, padding-left 0.2s;
+  }
+  .story:last-child { border-bottom: none; }
+
+  .story.liked {
+    border-left: 3px solid var(--navy);
+    padding-left: 10px;
+  }
+  .story.disliked {
+    opacity: 0.4;
+  }
+
+  .headline-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+
+  .section:first-of-type .story:first-child .headline {
+    font-size: 25px;
+    line-height: 1.18;
+  }
+
+  .headline {
+    font-family: 'Source Serif 4', serif;
+    font-weight: 600;
+    font-size: 19px;
+    line-height: 1.28;
+    margin: 0 0 6px;
+  }
+
+  .dek {
+    font-family: 'Source Serif 4', serif;
+    font-style: italic;
+    font-size: 14.5px;
+    line-height: 1.45;
+    color: var(--ink-soft);
+    margin: 0 0 8px;
+  }
+  .dek.loading {
+    color: #b8b5aa;
+  }
+  .dek .shimmer {
+    display: inline-block;
+    background: linear-gradient(90deg, #d8d5cc 25%, #ece9e0 50%, #d8d5cc 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.4s infinite;
+    color: transparent;
+    border-radius: 3px;
+  }
+  @keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  .story-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .byline {
+    font-family: 'Inter', sans-serif;
+    font-size: 10.5px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+
+  .feedback-buttons {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  .fb-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1px solid var(--rule);
+    background: var(--paper);
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--ink-soft);
+    padding: 0;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+  }
+  .fb-btn:active { transform: scale(0.93); }
+
+  .fb-btn.like.active {
+    background: var(--navy);
+    border-color: var(--navy);
+    color: #fff;
+  }
+  .fb-btn.dislike.active {
+    background: var(--masthead-red);
+    border-color: var(--masthead-red);
+    color: #fff;
+  }
+
+  .empty-state, .loading-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--ink-soft);
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+  }
+  .empty-state h2 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 900;
+    font-size: 22px;
+    color: var(--ink);
+    margin: 0 0 8px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="masthead">
+    <span class="the">Your Personal Edition</span>
+    <h1>The Daily Briefing</h1>
+    <hr class="rule-double" />
+    <div class="dateline">
+      <span id="dateLine">—</span>
+      <span id="storyCount">—</span>
+    </div>
+  </header>
+
+  <div class="customize">
+    <button class="customize-toggle" id="customizeToggle">
+      <span>Customize your edition</span>
+      <span id="toggleIcon">＋</span>
+    </button>
+    <div class="customize-panel" id="customizePanel">
+      <label>Your topics</label>
+      <div class="pill-row" id="myTopics"></div>
+
+      <label>Suggested topics</label>
+      <div class="pill-row" id="suggestedTopics"></div>
+
+      <label>Add your own</label>
+      <div class="custom-input-row">
+        <input type="text" id="topicInput" placeholder="e.g. Japanese literature, cycling" />
+        <button id="addTopicBtn">Add</button>
+      </div>
+
+      <div class="refresh-row">
+        <button class="refresh-btn" id="refreshBtn">Refresh Edition</button>
+      </div>
+    </div>
+  </div>
+
+  <main id="briefingContainer">
+    <div class="loading-state">Loading today's edition…</div>
+  </main>
+
+</div>
+
+<script>
+const dateLine = document.getElementById('dateLine');
+const storyCountEl = document.getElementById('storyCount');
+const myTopicsEl = document.getElementById('myTopics');
+const suggestedTopicsEl = document.getElementById('suggestedTopics');
+const topicInput = document.getElementById('topicInput');
+const addTopicBtn = document.getElementById('addTopicBtn');
+const refreshBtn = document.getElementById('refreshBtn');
+const briefingContainer = document.getElementById('briefingContainer');
+const customizeToggle = document.getElementById('customizeToggle');
+const customizePanel = document.getElementById('customizePanel');
+const toggleIcon = document.getElementById('toggleIcon');
+
+customizeToggle.onclick = () => {
+  const open = customizePanel.classList.toggle('open');
+  toggleIcon.textContent = open ? '−' : '＋';
+};
+
+function fmtDate(iso) {
+  const d = iso ? new Date(iso) : new Date();
+  return d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+}
+
+function fmtTime(iso) {
+  if (!iso) return '';
+  return new Date(iso).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+}
+
+async function loadTopics() {
+  const [topicsRes, suggestedRes] = await Promise.all([
+    fetch('/api/topics'),
+    fetch('/api/suggested-topics')
+  ]);
+  const topicsData = await topicsRes.json();
+  const suggestedData = await suggestedRes.json();
+  renderMyTopics(topicsData.topics);
+  renderSuggested(suggestedData.suggestions);
+  return topicsData.topics;
+}
+
+function renderMyTopics(topics) {
+  myTopicsEl.innerHTML = '';
+  if (topics.length === 0) {
+    myTopicsEl.innerHTML = '<span style="font-family: Inter, sans-serif; font-size: 13px; color: var(--ink-soft);">None yet — pick a suggestion below or add your own.</span>';
+    return;
+  }
+  topics.forEach(t => {
+    const pill = document.createElement('button');
+    pill.className = 'pill removable';
+    pill.innerHTML = `<span>${t}</span><span class="x">×</span>`;
+    pill.onclick = async () => {
+      await fetch('/api/topics/' + encodeURIComponent(t), { method: 'DELETE' });
+      await loadTopics();
+    };
+    myTopicsEl.appendChild(pill);
+  });
+}
+
+function renderSuggested(suggestions) {
+  suggestedTopicsEl.innerHTML = '';
+  if (suggestions.length === 0) {
+    suggestedTopicsEl.innerHTML = "<span style=\"font-family: Inter, sans-serif; font-size: 13px; color: var(--ink-soft);\">You've added them all.</span>";
+    return;
+  }
+  suggestions.forEach(t => {
+    const pill = document.createElement('button');
+    pill.className = 'pill';
+    pill.textContent = t;
+    pill.onclick = async () => {
+      await fetch('/api/topics', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: t })
+      });
+      await loadTopics();
+    };
+    suggestedTopicsEl.appendChild(pill);
+  });
+}
+
+addTopicBtn.onclick = async () => {
+  const val = topicInput.value.trim();
+  if (!val) return;
+  await fetch('/api/topics', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name: val })
+  });
+  topicInput.value = '';
+  await loadTopics();
+};
+topicInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') addTopicBtn.onclick(); });
+
+async function loadBriefing(refresh = false) {
+  briefingContainer.innerHTML = '<div class="loading-state">' + (refresh ? 'Pulling the latest stories…' : "Loading today's edition…") + '</div>';
+  const res = await fetch('/api/briefing' + (refresh ? '?refresh=true' : ''));
+  const data = await res.json();
+  dateLine.textContent = fmtDate(data.date);
+  renderBriefing(data.briefing);
+}
+
+function renderBriefing(briefing) {
+  const topics = Object.keys(briefing);
+  const totalStories = topics.reduce((sum, t) => sum + briefing[t].length, 0);
+  storyCountEl.textContent = totalStories + (totalStories === 1 ? ' story' : ' stories');
+
+  if (topics.length === 0) {
+    briefingContainer.innerHTML = `
+      <div class="empty-state">
+        <h2>No edition yet</h2>
+        <p>Open "Customize your edition" above, pick some topics, then hit Refresh.</p>
+      </div>`;
+    return;
+  }
+
+  briefingContainer.innerHTML = '';
+  const summaryQueue = [];
+
+  topics.forEach((topic, sectionIdx) => {
+    const section = document.createElement('div');
+    section.className = 'section';
+
+    const label = document.createElement('div');
+    label.className = 'section-label';
+    label.innerHTML = `<span>${topic}</span>`;
+    section.appendChild(label);
+
+    const stories = briefing[topic];
+    if (stories.length === 0) {
+      const none = document.createElement('div');
+      none.style.cssText = 'font-family: Inter, sans-serif; font-size: 13px; color: var(--ink-soft); padding: 12px 0;';
+      none.textContent = 'No stories found today.';
+      section.appendChild(none);
+    } else {
+      stories.forEach(story => {
+        const el = document.createElement('div');
+        el.className = 'story';
+        if (story.rating === 1) el.classList.add('liked');
+        if (story.rating === -1) el.classList.add('disliked');
+
+        const dekId = 'dek-' + story.id;
+        el.innerHTML = `
+          <a class="headline-link" href="${story.link}" target="_blank" rel="noopener noreferrer">
+            <div class="headline">${story.title}</div>
+          </a>
+          <div class="dek loading" id="${dekId}"><span class="shimmer">Generating a quick summary…</span></div>
+          <div class="story-footer">
+            <span class="byline">${story.source || 'Unknown source'}${story.published ? ' · ' + fmtTime(story.published) : ''}</span>
+            <div class="feedback-buttons">
+              <button class="fb-btn like ${story.rating === 1 ? 'active' : ''}" data-rating="1" aria-label="Like">👍</button>
+              <button class="fb-btn dislike ${story.rating === -1 ? 'active' : ''}" data-rating="-1" aria-label="Dislike">👎</button>
+            </div>
+          </div>
+        `;
+
+        const likeBtn = el.querySelector('.fb-btn.like');
+        const dislikeBtn = el.querySelector('.fb-btn.dislike');
+
+        function sendFeedback(rating) {
+          fetch('/api/feedback', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              id: story.id, topic, title: story.title,
+              source: story.source, link: story.link, rating
+            })
+          });
+        }
+
+        likeBtn.onclick = () => {
+          const isActive = likeBtn.classList.contains('active');
+          likeBtn.classList.toggle('active', !isActive);
+          dislikeBtn.classList.remove('active');
+          el.classList.remove('disliked');
+          el.classList.toggle('liked', !isActive);
+          sendFeedback(isActive ? 0 : 1);
+        };
+
+        dislikeBtn.onclick = () => {
+          const isActive = dislikeBtn.classList.contains('active');
+          dislikeBtn.classList.toggle('active', !isActive);
+          likeBtn.classList.remove('active');
+          el.classList.remove('liked');
+          el.classList.toggle('disliked', !isActive);
+          sendFeedback(isActive ? 0 : -1);
+        };
+
+        section.appendChild(el);
+        summaryQueue.push(story);
+      });
+    }
+
+    briefingContainer.appendChild(section);
+  });
+
+  runSummaryQueue(summaryQueue);
+}
+
+// Fetch AI summaries with limited concurrency so we don't fire 40 requests at once
+async function runSummaryQueue(stories, concurrency = 3) {
+  let index = 0;
+
+  async function worker() {
+    while (index < stories.length) {
+      const story = stories[index++];
+      await fetchSummary(story);
+    }
+  }
+
+  const workers = Array.from({ length: Math.min(concurrency, stories.length) }, worker);
+  await Promise.all(workers);
+}
+
+async function fetchSummary(story) {
+  const dekEl = document.getElementById('dek-' + story.id);
+  if (!dekEl) return;
+  try {
+    const params = new URLSearchParams({ title: story.title, link: story.link });
+    const res = await fetch(`/api/summary/${story.id}?${params.toString()}`);
+    const data = await res.json();
+
+    if (!data.enabled) {
+      dekEl.remove(); // no API key configured — just hide the dek entirely
+      return;
+    }
+    dekEl.classList.remove('loading');
+    dekEl.textContent = data.summary || 'Summary unavailable for this story.';
+  } catch (e) {
+    dekEl.classList.remove('loading');
+    dekEl.textContent = 'Summary unavailable for this story.';
+  }
+}
+
+refreshBtn.onclick = async () => {
+  refreshBtn.disabled = true;
+  refreshBtn.textContent = 'Refreshing…';
+  await loadBriefing(true);
+  refreshBtn.disabled = false;
+  refreshBtn.textContent = 'Refresh Edition';
+};
+
+(async () => {
+  dateLine.textContent = fmtDate();
+  await loadTopics();
+  await loadBriefing();
+})();
+</script>
+</body>
+</html>
